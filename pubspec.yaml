@@ -15,6 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   firebase_core: ^3.8.0
   json_dynamic_widget: ^7.3.1+8
+  cloud_firestore: ^5.5.0
 
 dev_dependencies:
   flutter_test:
