@@ -1,72 +1,69 @@
 import 'package:dynamic_ui/models/task.dart';
-import 'package:dynamic_ui/services/task_service.dart';
+import 'package:dynamic_ui/notifiers/task_notifier.dart';
+import 'package:dynamic_ui/screens/tasks/task_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SecondTabScreen extends StatefulWidget {
+class SecondTabScreen extends ConsumerStatefulWidget {
   const SecondTabScreen({super.key});
 
   @override
-  State<SecondTabScreen> createState() => _SecondTabScreenState();
+  SecondTabScreenState createState() => SecondTabScreenState();
 }
 
-class _SecondTabScreenState extends State<SecondTabScreen> {
-  final TaskService _taskService = TaskService();
+class SecondTabScreenState extends ConsumerState<SecondTabScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final taskNotifier = ref.read(taskNotifierProvider.notifier);
+    taskNotifier.loadTasks();
+  }
 
-  void _showTaskDetailsAlert(BuildContext context, Task task) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(task.status),
-        content: Text('Task ID: ${task.taskId}\n'
-            'Created At: ${task.createdAt}'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          )
-        ],
-      ),
-    );
+  // Refresh logic
+  Future<void> _onRefresh() async {
+    await ref.read(taskNotifierProvider.notifier).loadTasks();
   }
 
   @override
   Widget build(BuildContext context) {
+    final tasks = ref.watch(taskNotifierProvider);
+
     return Scaffold(
-      body: FutureBuilder<List<Task>>(
-        future: _taskService.getTasks(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Error loading tasks.'));
-          }
-
-          final tasks = snapshot.data ?? [];
-
-          if (tasks.isEmpty) {
-            return const Center(child: Text('No tasks available.'));
-          }
-
-          return ListView.builder(
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              final task = tasks[index];
-              return ListTile(
-                title: Text('Task ID: ${task.taskId}'),
-                subtitle: Text('Status: ${task.status}\n'
-                    'Created: ${task.createdAt}'),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    await _taskService.updateTaskStatus(task.taskId, 'deleted');
-                    setState(() {}); // Refresh the list after deletion
-                  },
-                ),
-                onTap: () => _showTaskDetailsAlert(context, task),
-              );
-            },
+      appBar: AppBar(
+        title: const Text('Tasks'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => ref.read(taskNotifierProvider.notifier).loadTasks(),
+          ),
+        ],
+      ),
+      body: tasks.isEmpty
+          ? const Center(child: Text('No tasks available.'))
+          : RefreshIndicator(
+        onRefresh: _onRefresh, // Refresh function triggered on pull-to-refresh
+        child: ListView.builder(
+          itemCount: tasks.length,
+          itemBuilder: (context, index) {
+            final task = tasks[index];
+            return TaskCard(task: task);
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          // Example task addition
+          final newTask = Task(
+            taskId: DateTime.now().millisecondsSinceEpoch.toString(),
+            createdAt: DateTime.now(),
+            status: 'active',
+          );
+          await ref.read(taskNotifierProvider.notifier).addTask(newTask);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Task added')),
           );
         },
+        child: const Icon(Icons.add),
       ),
     );
   }

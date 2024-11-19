@@ -18,8 +18,6 @@ void main() async {
   try {
     final jsonString = await rootBundle.loadString('assets/screen_1.json');
     screenConfigController.loadConfig(jsonString);
-    print('Screen configuration loaded');
-    print('Background color: ${screenConfigController.backgroundColor}');
     screenConfigController.updatePrimaryColor(screenConfigController.backgroundColor);
   } catch (e) {
     print('Failed to load screen configuration: $e');
