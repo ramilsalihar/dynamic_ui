@@ -1,4 +1,6 @@
+import 'package:dynamic_ui/core/service_locator.dart';
 import 'package:dynamic_ui/core/theme.dart';
+import 'package:dynamic_ui/core/config/screen_config.dart';
 import 'package:dynamic_ui/screens/first_tab_screen.dart';
 import 'package:dynamic_ui/screens/second_tab_screen.dart';
 import 'package:flutter/material.dart';
@@ -8,37 +10,49 @@ class App extends ConsumerStatefulWidget {
   const App({super.key});
 
   @override
-  _AppState createState() => _AppState();
+  AppState createState() => AppState();
 }
 
-class _AppState extends ConsumerState<App> {
+class AppState extends ConsumerState<App> {
 
   @override
   Widget build(BuildContext context) {
     final themeData = ref.watch(themeManagerProvider);
+    final screenConfigController = getIt<ScreenConfigController>();
+    final backgroundColor = screenConfigController.backgroundColor;
+
+
     return MaterialApp(
       title: 'Dynamic UI',
       theme: themeData,
+      debugShowCheckedModeBanner: false,
       home: DefaultTabController(
         length: 2,
         child: Scaffold(
-          appBar: AppBar(
-            backgroundColor: themeData.primaryColor,
-            bottom: TabBar(
-              dividerColor: Colors.transparent,
-              indicatorColor: Colors.transparent,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white.withOpacity(0.5),
-              tabs: [
-                Tab(text: 'Dynamic Screen'),
-                Tab(text: 'Tasks'),
-              ],
-            ),
-          ),
-          body: TabBarView(
+          body: Column(
             children: [
-              FirstTabScreen(),
-              SecondTabScreen(),
+              Container(
+                color: backgroundColor,
+                child: TabBar(
+                  dividerColor: Colors.transparent,
+                  indicatorColor: Colors.transparent,
+                  labelColor: Colors.white,
+                  overlayColor: WidgetStateProperty.all(backgroundColor),
+                  unselectedLabelColor: Colors.white.withOpacity(0.5),
+                  tabs: [
+                    Tab(text: 'Dynamic Screen'),
+                    Tab(text: 'Tasks'),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    FirstTabScreen(),
+                    SecondTabScreen(),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

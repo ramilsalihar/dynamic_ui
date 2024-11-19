@@ -1,21 +1,17 @@
-import 'dart:convert';
-import 'package:dynamic_ui/core/dummy_data.dart';
-import 'package:dynamic_ui/models/screen_config.dart';
+import 'package:dynamic_ui/core/config/component.dart';
+import 'package:dynamic_ui/core/config/screen_config.dart';
+import 'package:dynamic_ui/core/service_locator.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class FirstTabScreen extends StatelessWidget {
   const FirstTabScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final screenConfig = ScreenConfig.fromJson(
-      json.decode(jsonString) as Map<String, dynamic>,
-    );
+    final screenConfigController = getIt<ScreenConfigController>();
+    final screenConfig = screenConfigController.screenConfig;
+    final backgroundColor = screenConfigController.backgroundColor;
 
-    final backgroundColor = Color(
-      int.parse('0xFF${screenConfig.backgroundColor}'),
-    );
 
     return Container(
       color: backgroundColor,
@@ -66,7 +62,7 @@ class FirstTabScreen extends StatelessWidget {
           child: Text(component.params['text'] ?? 'Button'),
         );
       default:
-        return SizedBox.shrink();
+        return const SizedBox.shrink();
     }
   }
 }

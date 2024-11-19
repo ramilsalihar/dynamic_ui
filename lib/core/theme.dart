@@ -5,7 +5,10 @@ Future<ThemeData> fetchInitialTheme() async {
   await Future.delayed(const Duration(seconds: 2));
   return ThemeData(
     brightness: Brightness.light,
-    primarySwatch: Colors.teal,
+    primaryColor: Colors.teal,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.teal,
+    ),
   );
 }
 
@@ -14,13 +17,13 @@ final initialThemeProvider = FutureProvider<ThemeData>((ref) async {
 });
 
 final themeManagerProvider =
-StateNotifierProvider<ThemeManager, ThemeData>((ref) {
+    StateNotifierProvider<ThemeManager, ThemeData>((ref) {
   final initialTheme = ref.watch(initialThemeProvider).asData?.value;
   return ThemeManager(initialTheme ?? ThemeData.light());
 });
 
 class ThemeManager extends StateNotifier<ThemeData> {
-  ThemeManager(ThemeData initialTheme) : super(initialTheme);
+  ThemeManager(super.initialTheme);
 
   void updatePrimaryColor(Color newColor) {
     state = state.copyWith(
