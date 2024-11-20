@@ -14,6 +14,7 @@ void main() async {
   );
 
   setupLocator();
+
   final screenConfigController = getIt<ScreenConfigController>();
   try {
     final jsonString = await rootBundle.loadString('assets/screen_1.json');

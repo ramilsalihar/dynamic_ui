@@ -1,3 +1,5 @@
+import 'package:dynamic_ui/core/config/screen_config.dart';
+import 'package:dynamic_ui/core/service_locator.dart';
 import 'package:dynamic_ui/models/task.dart';
 import 'package:dynamic_ui/notifiers/task_notifier.dart';
 import 'package:dynamic_ui/screens/tasks/task_card.dart';
@@ -19,30 +21,24 @@ class SecondTabScreenState extends ConsumerState<SecondTabScreen> {
     taskNotifier.loadTasks();
   }
 
-  // Refresh logic
   Future<void> _onRefresh() async {
     await ref.read(taskNotifierProvider.notifier).loadTasks();
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenConfigController = getIt<ScreenConfigController>();
     final tasks = ref.watch(taskNotifierProvider);
+    final backgroundColor = screenConfigController.backgroundColor;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tasks'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(taskNotifierProvider.notifier).loadTasks(),
-          ),
-        ],
-      ),
+      backgroundColor: backgroundColor,
       body: tasks.isEmpty
           ? const Center(child: Text('No tasks available.'))
           : RefreshIndicator(
-        onRefresh: _onRefresh, // Refresh function triggered on pull-to-refresh
+        onRefresh: _onRefresh,
         child: ListView.builder(
+          padding: const EdgeInsets.only(top: 20),
           itemCount: tasks.length,
           itemBuilder: (context, index) {
             final task = tasks[index];
@@ -50,20 +46,35 @@ class SecondTabScreenState extends ConsumerState<SecondTabScreen> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Example task addition
-          final newTask = Task(
-            taskId: DateTime.now().millisecondsSinceEpoch.toString(),
-            createdAt: DateTime.now(),
-            status: 'active',
-          );
-          await ref.read(taskNotifierProvider.notifier).addTask(newTask);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Task added')),
-          );
-        },
-        child: const Icon(Icons.add),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () async {
+              _onRefresh();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Tasks refreshed')),
+              );
+            },
+            child: const Icon(Icons.refresh),
+          ),
+          const SizedBox(height: 10),
+          FloatingActionButton(
+            onPressed: () async {
+              final newTask = Task(
+                taskId: DateTime.now().millisecondsSinceEpoch.toString(),
+                createdAt: DateTime.now(),
+                status: 'active',
+              );
+              await ref.read(taskNotifierProvider.notifier).addTask(newTask);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Task added')),
+              );
+            },
+            child: const Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

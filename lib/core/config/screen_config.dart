@@ -33,7 +33,6 @@ class ScreenConfigController {
     );
   }
 
-  // Set the primary color in ThemeManager
   void updatePrimaryColor(Color backgroundColor) {
     final themeManager = GetIt.instance<ThemeManager>();
     themeManager.updatePrimaryColor(backgroundColor);
