@@ -4,7 +4,7 @@ import 'package:dynamic_ui/core/service_locator.dart';
 import 'package:dynamic_ui/core/theme.dart';
 import 'package:dynamic_ui/models/task.dart';
 import 'package:dynamic_ui/notifiers/task_notifier.dart';
-import 'package:dynamic_ui/screens/tasks/task_card.dart';
+import 'package:dynamic_ui/widgets/task_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -70,7 +70,12 @@ class SecondTabScreenState extends ConsumerState<SecondTabScreen>
           : RefreshIndicator(
         onRefresh: _onRefresh,
         child: ListView.builder(
-          padding: const EdgeInsets.only(top: 20),
+          padding: const EdgeInsets.only(
+            top: 16,
+            left: 16,
+            right: 16,
+            bottom: kToolbarHeight * 2,
+          ),
           itemCount: tasks.length,
           itemBuilder: (context, index) {
             final task = tasks[index];

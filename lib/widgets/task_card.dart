@@ -19,6 +19,7 @@ class TaskCard extends ConsumerWidget with DialogHelper {
   Widget build(BuildContext context, WidgetRef ref) {
     final taskNotifier = ref.read(taskNotifierProvider.notifier);
     final theme = ref.read(themeManagerProvider);
+    final size = MediaQuery.of(context).size;
 
     return GestureDetector(
       onTap: () {
@@ -29,6 +30,7 @@ class TaskCard extends ConsumerWidget with DialogHelper {
         );
       },
       child: Container(
+        width: size.width * 0.9,
         margin: const EdgeInsets.symmetric(
           vertical: 5,
           horizontal: 10,
@@ -49,41 +51,46 @@ class TaskCard extends ConsumerWidget with DialogHelper {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Task ID: ${task.taskId}',
-                    style: theme.textTheme.headlineLarge,
-                  ),
-                  const SizedBox(height: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Created At: ${task.createdAt.toFormattedString()}',
-                        style: theme.textTheme.headlineMedium,
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 5,
+              SizedBox(
+                width: size.width * 0.6,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Task ID: ${task.taskId}',
+                      style: theme.textTheme.headlineLarge,
+                      maxLines: 5,
+                    ),
+                    const SizedBox(height: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Created At: ${task.createdAt.toFormattedString()}',
+                          style: theme.textTheme.headlineMedium,
+                          maxLines: 5,
                         ),
-                        decoration: BoxDecoration(
-                          color: statusColors[task.status],
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        child: Text(
-                          'Status: ${task.status}',
-                          style: theme.textTheme.headlineSmall!.copyWith(
-                            color: Colors.white,
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColors[task.status],
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: Text(
+                            'Status: ${task.status}',
+                            style: theme.textTheme.headlineSmall!.copyWith(
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
