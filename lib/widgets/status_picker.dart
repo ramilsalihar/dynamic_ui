@@ -38,18 +38,19 @@ class _StatusPickerState extends ConsumerState<StatusPicker> {
     final statusOptions = ['in progress', 'done', 'failed', 'deleted'];
 
     return SizedBox(
-      width: size.width * 0.4,
+      width: size.width * 0.5,
       child: GridView.builder(
         shrinkWrap: true,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
-          childAspectRatio: 3,
+          childAspectRatio: 1.5,
         ),
         itemCount: statusOptions.length,
         itemBuilder: (context, index) {
           final status = statusOptions[index];
+          print('status: $status');
           final isSelected = status == selectedStatus;
 
           return GestureDetector(

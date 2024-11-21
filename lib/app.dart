@@ -28,10 +28,12 @@ class AppState extends ConsumerState<App> {
       home: DefaultTabController(
         length: 2,
         child: Scaffold(
+          backgroundColor: backgroundColor,
           body: Column(
             children: [
               Container(
                 color: backgroundColor,
+                margin: const EdgeInsets.only(top: kToolbarHeight),
                 child: TabBar(
                   dividerColor: Colors.transparent,
                   indicatorColor: Colors.transparent,

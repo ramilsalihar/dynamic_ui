@@ -50,9 +50,10 @@ class TaskCard extends ConsumerWidget with DialogHelper {
           padding: const EdgeInsets.all(15.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                width: size.width * 0.6,
+                width: size.width * 0.5,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -94,35 +95,52 @@ class TaskCard extends ConsumerWidget with DialogHelper {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.mode_edit_outline_rounded),
-                    onPressed: () async {
-                      showTaskEditDialog(
-                        context,
-                        task.status,
-                        theme,
-                        (value) {
-                          taskNotifier.editTask(
-                            task.taskId,
-                            value,
-                          );
-                        },
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Task updated')),
-                      );
-                    },
-                  ),
-                  if (task.status != 'deleted')
-                    IconButton(
-                      icon: const Icon(Icons.delete),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.mode_edit_outline_rounded,
+                        color: Colors.white,
+                      ),
                       onPressed: () async {
-                        await taskNotifier.deleteTask(task.taskId);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Task deleted')),
+                        showTaskEditDialog(
+                          context,
+                          task.status,
+                          theme,
+                          (value) {
+                            taskNotifier.editTask(
+                              task.taskId,
+                              value,
+                            );
+                          },
                         );
                       },
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  if (task.status != 'deleted')
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.delete,
+                          color: Colors.white,
+                        ),
+                        onPressed: () async {
+                          await taskNotifier.deleteTask(task.taskId);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Task deleted')),
+                          );
+                        },
+                      ),
                     ),
                 ],
               ),

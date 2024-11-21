@@ -154,6 +154,9 @@ mixin DialogHelper {
               TextButton(
                 onPressed: () {
                   onEdit(controller.text);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Task updated')),
+                  );
                   Navigator.pop(context);
                 },
                 child: Text(
