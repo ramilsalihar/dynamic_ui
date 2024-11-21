@@ -21,7 +21,6 @@ class AppState extends ConsumerState<App> {
     final screenConfigController = getIt<ScreenConfigController>();
     final backgroundColor = screenConfigController.backgroundColor;
 
-
     return MaterialApp(
       title: 'Dynamic UI',
       theme: themeData,
@@ -39,13 +38,14 @@ class AppState extends ConsumerState<App> {
                   labelColor: Colors.white,
                   overlayColor: WidgetStateProperty.all(backgroundColor),
                   unselectedLabelColor: Colors.white.withOpacity(0.5),
-                  tabs: [
+                  labelStyle: themeData.textTheme.headlineLarge,
+                  tabs: const [
                     Tab(text: 'Dynamic Screen'),
                     Tab(text: 'Tasks'),
                   ],
                 ),
               ),
-              Expanded(
+              const Expanded(
                 child: TabBarView(
                   children: [
                     FirstTabScreen(),

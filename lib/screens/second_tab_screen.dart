@@ -1,5 +1,7 @@
 import 'package:dynamic_ui/core/config/screen_config.dart';
+import 'package:dynamic_ui/core/mixin/dialog_helper.dart';
 import 'package:dynamic_ui/core/service_locator.dart';
+import 'package:dynamic_ui/core/theme.dart';
 import 'package:dynamic_ui/models/task.dart';
 import 'package:dynamic_ui/notifiers/task_notifier.dart';
 import 'package:dynamic_ui/screens/tasks/task_card.dart';
@@ -13,28 +15,58 @@ class SecondTabScreen extends ConsumerStatefulWidget {
   SecondTabScreenState createState() => SecondTabScreenState();
 }
 
-class SecondTabScreenState extends ConsumerState<SecondTabScreen> {
+class SecondTabScreenState extends ConsumerState<SecondTabScreen>
+    with DialogHelper {
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
-    final taskNotifier = ref.read(taskNotifierProvider.notifier);
-    taskNotifier.loadTasks();
+    _loadTasks();
+  }
+
+  Future<void> _loadTasks() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await ref.read(taskNotifierProvider.notifier).loadTasks();
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _onRefresh() async {
-    await ref.read(taskNotifierProvider.notifier).loadTasks();
+    await _loadTasks();
   }
 
   @override
   Widget build(BuildContext context) {
     final screenConfigController = getIt<ScreenConfigController>();
     final tasks = ref.watch(taskNotifierProvider);
+    final taskNotifier = ref.read(taskNotifierProvider.notifier);
     final backgroundColor = screenConfigController.backgroundColor;
+    final theme = ref.read(themeManagerProvider);
 
     return Scaffold(
       backgroundColor: backgroundColor,
-      body: tasks.isEmpty
-          ? const Center(child: Text('No tasks available.'))
+      body: _isLoading
+          ? const Center(
+        child: CircularProgressIndicator(
+          color: Color(0xff00c6cf),
+        ),
+      )
+          : tasks.isEmpty
+          ? Center(
+        child: Text(
+          'No tasks available.',
+          style: theme.textTheme.headlineLarge!.copyWith(
+            color: Colors.white,
+          ),
+        ),
+      )
           : RefreshIndicator(
         onRefresh: _onRefresh,
         child: ListView.builder(
@@ -51,8 +83,11 @@ class SecondTabScreenState extends ConsumerState<SecondTabScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: () async {
-              _onRefresh();
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            onPressed: _isLoading ? null : () async {
+              await _onRefresh();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Tasks refreshed')),
               );
@@ -61,13 +96,22 @@ class SecondTabScreenState extends ConsumerState<SecondTabScreen> {
           ),
           const SizedBox(height: 10),
           FloatingActionButton(
-            onPressed: () async {
-              final newTask = Task(
-                taskId: DateTime.now().millisecondsSinceEpoch.toString(),
-                createdAt: DateTime.now(),
-                status: 'active',
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            onPressed: _isLoading ? null : () async {
+              showTaskAddDialog(
+                context: context,
+                theme: theme,
+                onAddTask: (value) {
+                  final newTask = Task(
+                    taskId: DateTime.now().millisecondsSinceEpoch.toString(),
+                    createdAt: DateTime.now(),
+                    status: value,
+                  );
+                  taskNotifier.addTask(newTask);
+                },
               );
-              await ref.read(taskNotifierProvider.notifier).addTask(newTask);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Task added')),
               );

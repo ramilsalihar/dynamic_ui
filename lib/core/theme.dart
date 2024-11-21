@@ -1,26 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-Future<ThemeData> fetchInitialTheme() async {
-  await Future.delayed(const Duration(seconds: 2));
-  return ThemeData(
-    brightness: Brightness.light,
-    primaryColor: Colors.teal,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.teal,
+final themeManagerProvider = StateNotifierProvider<ThemeManager, ThemeData>(
+  (ref) => ThemeManager(defaultTheme),
+);
+
+final defaultTheme = ThemeData(
+  brightness: Brightness.light,
+  primaryColor: Colors.white,
+  floatingActionButtonTheme: const FloatingActionButtonThemeData(
+    backgroundColor: Color(0xff00c6cf),
+  ),
+  textTheme: GoogleFonts.montserratTextTheme(
+    const TextTheme(
+      displayMedium: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
+      headlineLarge: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w500,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w500,
+      ),
+      headlineSmall: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
     ),
-  );
-}
-
-final initialThemeProvider = FutureProvider<ThemeData>((ref) async {
-  return fetchInitialTheme();
-});
-
-final themeManagerProvider =
-    StateNotifierProvider<ThemeManager, ThemeData>((ref) {
-  final initialTheme = ref.watch(initialThemeProvider).asData?.value;
-  return ThemeManager(initialTheme ?? ThemeData.light());
-});
+  ),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.teal,
+    titleTextStyle: TextStyle(
+      color: Colors.white,
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+);
 
 class ThemeManager extends StateNotifier<ThemeData> {
   ThemeManager(super.initialTheme);
@@ -28,15 +48,7 @@ class ThemeManager extends StateNotifier<ThemeData> {
   void updatePrimaryColor(Color newColor) {
     state = state.copyWith(
       primaryColor: newColor,
-      appBarTheme: AppBarTheme(backgroundColor: newColor),
-    );
-  }
-
-  void toggleBrightness() {
-    state = state.copyWith(
-      brightness: state.brightness == Brightness.light
-          ? Brightness.dark
-          : Brightness.light,
+      appBarTheme: state.appBarTheme.copyWith(backgroundColor: newColor),
     );
   }
 }
